@@ -9,9 +9,9 @@ This phase covers:
 
 ---
 
-## Tech Stack (suggested)
+## Tech Stack
 - **Node.js + Express**
 - **MongoDB + Mongoose**
 - **JWT** for auth
 - **bcrypt** for password hashing
-- **Nodemailer** (or your OTP email helper library) for sending OTPs
+- **Nodemailer** for sending OTPs
