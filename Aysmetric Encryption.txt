@@ -1,0 +1,14 @@
+Asymmetric encryption uses two keys:
+    Public key
+    Private key
+
+When someone wants to send a secure message:
+    He asks for the public key of the other person.
+    The message is encrypted using the public key.
+    The message is decrypted using the private key, which is only with the owner.
+
+So:
+    Public key → encrypt
+    Private key → decrypt
+
+Only the person who has the private key can read the message

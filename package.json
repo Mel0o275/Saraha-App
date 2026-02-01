@@ -1,0 +1,26 @@
+{
+  "name": "mai-bakry-ahmed---c45-node.js-10am-4pm-(dokki)-offline---assignment-6",
+  "version": "1.0.0",
+  "main": "src/main.js",
+  "type": "module",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development nodemon src/main.js --watch",
+    "prod": "cross-env NODE_ENV=production node main.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cross-env": "^10.1.0",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mongodb": "^7.0.0",
+    "mongoose": "^9.1.5",
+    "nodemailer": "^7.0.13",
+    "nodemon": "^3.1.11"
+  }
+}
