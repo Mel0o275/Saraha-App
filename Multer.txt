@@ -1,0 +1,14 @@
+Multer is a middleware in Node.js + Express.
+Its main job is handling file uploads.
+
+When a user uploads:
+                an image
+                a PDF
+                or any file
+
+Multer is the one that:
+                    receives the file from the request
+                    processes it
+                    saves it on the server (disk or memory)
+                    and then attaches it to the request object
+                    instead of dealing with raw file data yourself

@@ -18,6 +18,19 @@ export const DB_URL = process.env.DB_URL
 
 export const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY
 
+export const SYSTEM_TOKEN_SECRET_KEY = process.env.SYSTEM_TOKEN_SECRET_KEY;
+
+export const USER_TOKEN_SECRET_KEY = process.env.USER_TOKEN_SECRET_KEY;
+
+export const REFRESH_SYSTEM_TOKEN_SECRET_KEY = process.env.REFRESH_SYSTEM_TOKEN_SECRET_KEY
+export const REFRESH_USER_TOKEN_SECRET_KEY = process.env.REFRESH_USER_TOKEN_SECRET_KEY;
+
+console.log({
+    SYSTEM_TOKEN_SECRET_KEY,
+    USER_TOKEN_SECRET_KEY,
+    REFRESH_SYSTEM_TOKEN_SECRET_KEY,
+    REFRESH_USER_TOKEN_SECRET_KEY
+});
 
 export const SALT_ROUND = parseInt(process.env.SALT_ROUND ?? '10')
 console.log({SALT_ROUND});

@@ -1,8 +1,12 @@
 import { UserModel } from "../../db/model/User.Model.js";
-import jwt from "jsonwebtoken";
 import { compareHash, generateHash } from "../../common/security/hash.security.js";
 import { encryptData } from "../../common/security/encrypt.security.js";
 import { sendOtpEmail } from "../../common/utils/otp/email.otp.js";
+import { REFRESH_SYSTEM_TOKEN_SECRET_KEY, REFRESH_USER_TOKEN_SECRET_KEY, SYSTEM_TOKEN_SECRET_KEY, USER_TOKEN_SECRET_KEY } from "../../../config/config.service.js";
+import { ProviderEnum, RefreshAudianceEnum, RoleEnum, TokenTypeEnum } from "../../common/Enum/user.enum.js";
+import { AudianceEnum } from "../../common/Enum/user.enum.js";
+import { createLoginCredentials, generateToken, getTokenSignature } from "../../common/security/token.security.js";
+import { OAuth2Client } from 'google-auth-library';
 
 export const signUp = async (inputs) => {
     const { name, email, password, phone, age } = inputs;
@@ -22,12 +26,41 @@ export const signUp = async (inputs) => {
         phone: cryptedPhonr,
         age,
         otp: otpHash,
-        otpExpires: new Date(Date.now() +  60 * 1000),
+        otpExpires: new Date(Date.now() + 5 * 60 * 1000),
         isVerified: false,
     });
     await user.save();
     await sendOtpEmail(email, randomOTP);
     return user;
+}
+
+export const signUpWithGoogle = async (idToken) => {
+    const client = new OAuth2Client();
+    const ticket = await client.verifyIdToken({
+        idToken,
+        audience: '905435648785-h4o7bnprocue7pf5lcgenkn6a729014r.apps.googleusercontent.com'  // Specify the WEB_CLIENT_ID of the app that accesses the backend
+        // Or, if multiple clients access the backend:
+        //[WEB_CLIENT_ID_1, WEB_CLIENT_ID_2, WEB_CLIENT_ID_3]
+    });
+    const payload = ticket.getPayload();
+    console.log(payload);
+    if (!payload.email_verified) {
+        throw new Error('Email not verified by Google');
+    }
+    const exist = await UserModel.findOne({ email: payload.email });
+    if (exist) {
+        if (exist.provider === ProviderEnum.LOCAL) {
+            throw new Error("User with this email already exists. Please login with email/password.");
+        }
+        return await loginWithGoogle(idToken);
+    }
+    const user = await UserModel.create({
+        name: payload.name,
+        email: payload.email,
+        provider: ProviderEnum.GOOGLE,
+        isVerified: true,
+    })
+    return user
 }
 
 export const verifyOtpService = async (email, otp) => {
@@ -82,7 +115,7 @@ export const resendOtpService = async (email) => {
     const randomOTP = Math.floor(1000 + Math.random() * 9000).toString();
     const otpHash = await generateHash(randomOTP);
     user.otp = otpHash;
-    user.otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    user.otpExpires = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
     await user.save();
     await sendOtpEmail(email, randomOTP);
 
@@ -95,13 +128,41 @@ export const login = async (inputs) => {
     if (!exist) {
         throw new Error('User with this email not exists or wrong password');
     }
+
     if (!exist.isVerified) {
         throw new Error('User with this email not verified');
     }
+
     const isPasswordValid = await compareHash(password, exist.password);
     if (!isPasswordValid) {
         throw new Error('User with this email not exists or wrong password');
     }
-    const token = jwt.sign({ _id: exist._id }, "MYOSHA", { expiresIn: '1h' });
-    return token;
+
+    const { token, refreshToken } = await createLoginCredentials(exist);
+
+    return { token, refreshToken };
+
+}
+
+export const loginWithGoogle = async (idToken) => {
+    const client = new OAuth2Client();
+    const ticket = await client.verifyIdToken({
+        idToken,
+        audience: '905435648785-h4o7bnprocue7pf5lcgenkn6a729014r.apps.googleusercontent.com'
+        // Or, if multiple clients access the backend:
+        //[WEB_CLIENT_ID_1, WEB_CLIENT_ID_2, WEB_CLIENT_ID_3]
+    });
+    const payload = ticket.getPayload();
+    console.log(payload);
+    if (!payload.email_verified) {
+        throw new Error('Email not verified by Google');
+    }
+    const exist = await UserModel.findOne({ email: payload.email });
+    console.log(exist);
+    if (!exist || exist.provider !== ProviderEnum.GOOGLE) {
+        throw new Error('invalid provider, please login with your email and password');
+
+    }
+    return await createLoginCredentials(exist);
+
 }
