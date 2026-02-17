@@ -1,9 +1,11 @@
 import { Router } from "express";
 import { login, loginWithGoogle, resendOtpService, signUp, signUpWithGoogle, verifyOtpService } from "./auth.service.js";
+import { loginSchema, signUpSchema } from "./auth.schema.js";
+import { validate } from "../../middleware/validate.js";
 
 const router = Router();
 
-router.post("/signup", async (req, res) => {
+router.post("/signup", validate(signUpSchema),async (req, res) => {
     const input = req.body;
     try {
         const result = await signUp(input);
@@ -37,7 +39,7 @@ router.post("/resend-otp", async (req, res) => {
     }
 });
 
-router.post("/login", async (req, res) => {
+router.post("/login", validate(loginSchema),async (req, res) => {
     const input = req.body;
     try {
         const token = await login(input);
