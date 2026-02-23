@@ -7,7 +7,11 @@ import fs from "fs";
 import path from "path";
 
 export const profile = async(user) => {
-    return user;
+    return {
+        name: user.name,
+        email: user.email,
+        profilePicture: user.profilePicture,
+    };
 }
 
 export const shareProfile = async(userId) => {
