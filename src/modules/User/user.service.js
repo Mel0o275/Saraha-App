@@ -14,25 +14,25 @@ export const profile = async(user) => {
     };
 }
 
-export const shareProfile = async(userId) => {
+export const shareProfile = async (userId, viewerId = null) => {
     const user = await UserModel.findById(userId);
     if (!user) {
         throw new Error("User not found");
     }
-    if(!user.phone) {
-        return {
-            name: user.name,
-            email: user.email,
-            profilePicture: user.profilePicture
-        }
+
+    if (viewerId && viewerId.toString() !== userId.toString()) {
+        user.visitCount = (user.visitCount || 0) + 1;
+        await user.save();
     }
-    return {
+
+    const result = {
         name: user.name,
         email: user.email,
-        profilePicture: user.profilePicture,
-        phone: await decryptData(user.phone)
+        profilePicture: user.profilePicture
     };
-}
+
+    return result;
+};
 
 export const profilePic = async(file, user) => {
     const profile = await UserModel.findById(user._id);
@@ -118,24 +118,24 @@ export const logout = async({device}, user, decode) => {
     return { message: "Logout successful", status };
 }
 
-export const visitProfile = async (viewer, profileId) => {
-    const profile = await UserModel.findById(profileId);
+// export const visitProfile = async (viewer, profileId) => {
+//     const profile = await UserModel.findById(profileId);
 
-    if (!profile) {
-        throw new Error("User not found");
-    }
+//     if (!profile) {
+//         throw new Error("User not found");
+//     }
 
-    if (viewer._id.toString() !== profileId.toString()) {
-        profile.visitCount += 1;
-        await profile.save();
-    }
+//     if (viewer._id.toString() !== profileId.toString()) {
+//         profile.visitCount += 1;
+//         await profile.save();
+//     }
 
-    return {
-        name: profile.name,
-        email: profile.email,
-        profilePicture: profile.profilePicture,
-    };
-};
+//     return {
+//         name: profile.name,
+//         email: profile.email,
+//         profilePicture: profile.profilePicture,
+//     };
+// };
 
 export const rotateToken = async(user) => {
     const result = await createLoginCredentials(user);

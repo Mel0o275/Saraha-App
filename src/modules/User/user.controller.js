@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { coverPic, deleteProfilePic, logout, profile, profilePic, rotateToken, shareProfile, visitProfile } from "./user.service.js";
+import { coverPic, deleteProfilePic, logout, profile, profilePic, rotateToken, shareProfile } from "./user.service.js";
 import { authentication, authorization } from "../../middleware/Auth.middleware.js";
 import { RoleEnum, TokenTypeEnum } from "../../common/Enum/user.enum.js";
 import { validate } from "../../middleware/validate.js";
@@ -22,18 +22,19 @@ router.get("/profile", authentication(), async (req, res) => {
     }
 })
 
-router.get("/:userId/profile-share", validate(validation.shareProfile), async (req, res) => {
+router.get("/:userId/profile-share", authentication(), validate(validation.shareProfile), async (req, res) => {
     try {
-        const account = await shareProfile(req.params.userId);
+        const account = await shareProfile(req.params.userId, req.user?._id);
+
         res.status(200).json({
-            message: "User profile retrieved successfully", data: {
-                account
-            }
+            message: "User profile retrieved successfully",
+            data: { account }
         });
+
     } catch (error) {
         res.status(500).json({ message: "Error retrieving user profile", error: error.message });
     }
-})
+});
 
 router.patch("/uploadProfile", authentication(), upload({
     customPath: "user/images", validation: fieldValidation.image, size: 10
@@ -108,20 +109,20 @@ router.post("/logout", authentication(), async (req, res) => {
     }
 })
 
-router.get("/profile/:id", authentication(), async (req, res) => {
-    try {
-        const profile = await visitProfile(req.user, req.params.id);
-        res.status(200).json({
-            message: "Profile fetched successfully",
-            data: profile
-        });
+// router.get("/profile/:id", authentication(), async (req, res) => {
+//     try {
+//         const profile = await visitProfile(req.user, req.params.id);
+//         res.status(200).json({
+//             message: "Profile fetched successfully",
+//             data: profile
+//         });
 
-    } catch (error) {
-        res.status(500).json({
-            message: error.message
-        });
-    }
-});
+//     } catch (error) {
+//         res.status(500).json({
+//             message: error.message
+//         });
+//     }
+// });
 
 router.get(
     "/views",
