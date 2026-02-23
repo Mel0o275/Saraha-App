@@ -13,6 +13,12 @@ const UserSchema = new mongoose.Schema(
 
         age: { type: Number, min: 18, max: 60 },
 
+        profilePicture: { type: String, default: "" },
+
+        coverPicture: [{ type: String, default: [] }],
+
+        gallary: [{ type: String, default: [] }],
+
         role: { type: String, enum: Object.values(RoleEnum), default: RoleEnum.USER },
 
         provider: { type: String, enum: Object.values(ProviderEnum), default: ProviderEnum.LOCAL },
@@ -22,6 +28,10 @@ const UserSchema = new mongoose.Schema(
         otpExpires: { type: Date },
 
         isVerified: { type: Boolean, default: false },
+
+        changeCredentialsTime: { type: Date, default: Date.now },
+
+        visitCount: { type: Number, default: 0 }
     },
     { timestamps: true }
 );

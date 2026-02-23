@@ -6,8 +6,9 @@ export const authentication = (tokenType=TokenTypeEnum.TOKEN) => {
         if(!req.headers.authorization) {
             return res.status(401).json({ message: "Unauthorized" });
         }
-        const {user} = await verifyToken({ token: req.headers?.authorization, tokenType });
+        const {user, decoded} = await verifyToken({ token: req.headers?.authorization, tokenType });
         req.user = user;
+        req.decoded = decoded;
         next();
     }
 }

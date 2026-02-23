@@ -22,3 +22,8 @@ export const TokenTypeEnum = {
     TOKEN : 'token',
     REFRESH: "refresh"
 }
+
+export const LogoutTypeEnum = {
+    ALL: 'all',
+    CURRENT: 'current'
+}
