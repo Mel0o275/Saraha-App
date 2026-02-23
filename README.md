@@ -48,3 +48,24 @@ This phase covers:
 - Generate access + refresh tokens after Google verification
 
 ---
+
+## Phase 3: Share Profile, Profile & Cover Image Upload, and Count Visits Only For Admin
+
+This phase covers:
+- Share profile endpoint
+- File uploads using Multer (e.g., profile picture, Cover picture)
+- Count Visits endpoints
+
+### Tech Stack (Phase 3)
+- **Multer** for file uploads
+---
+
+### Features (Phase 3)
+
+#### 1) Profile
+- Get logged-in user profile (JWT)
+- Share profile
+- Upload / update profile picture (JWT)
+- Upload / update cover picture (JWT)
+
+#### 2) Count Visits
