@@ -2,6 +2,7 @@ import express from 'express'
 import { port } from '../config/config.service.js'
 import authRouter from './modules/Auth/auth.controllers.js'
 import userRouter from './modules/User/user.controller.js'
+import adminRouter from './modules/admin/admin.controller.js'
 import cors from 'cors'
 import { connectRedis } from './db/radis.connection.js'
 
@@ -13,6 +14,7 @@ async function bootstrap() {
 
     app.use('/users',authRouter)
     app.use('/users',userRouter)
+    app.use('/admin',adminRouter)
     // app.use("/uploads", express.static("uploads"));
 
     // //invalid routing
