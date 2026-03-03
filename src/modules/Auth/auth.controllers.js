@@ -1,7 +1,8 @@
 import { Router } from "express";
-import { login, loginWithGoogle, resendOtpService, signUp, signUpWithGoogle, verifyOtpService } from "./auth.service.js";
+import { confirm2FA, confirmLogin2FA, forgetPassword, login, loginWithGoogle, resendOtpService, resetPassword, signUp, signUpWithGoogle, twoFactorAuth, verifyOtpService } from "./auth.service.js";
 import { loginSchema, signUpSchema } from "./auth.schema.js";
 import { validate } from "../../middleware/validate.js";
+import { authentication } from "../../middleware/Auth.middleware.js";
 
 const router = Router();
 
@@ -53,6 +54,15 @@ router.post("/login", validate(loginSchema),async (req, res) => {
     }
 });
 
+router.post('/login-confirm' ,async (req, res) => {
+    try {
+        const result = await confirmLogin2FA({ email: req.body.email, otp: req.body.otp });
+        res.json(result);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+});
+
 router.post("/signup/gmail", async (req, res) => {
     try {
         const { idToken } = req.body;
@@ -87,6 +97,44 @@ console.log("idToken:", idToken);
             message: "Error logging in",
             error: error.message,
         });
+    }
+});
+
+router.post("/forget-pass", async (req, res) => {
+    const { email } = req.body;
+    try {
+        const result = await forgetPassword(email);
+        res.status(200).json({ message: "Password reset link sent to email" });
+    } catch (error) {
+        res.status(500).json({ message: "Error sending password reset link", error: error.message });
+    }
+});
+
+router.post(`/reset-pass`, async (req, res) => {
+    const { email, newPassword } = req.body;
+    try {
+        const result = await resetPassword(email, newPassword);
+        res.status(200).json({ message: "Password updated successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Error updating password", error: error.message });
+    }
+})
+
+router.post('/enable-2fa', authentication(), async (req, res) => {
+    try {
+        const result = await twoFactorAuth(req.body);
+        res.json(result);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+router.post('/confirm-2fa', authentication(), async (req, res) => {
+    try {
+        const result = await confirm2FA({ userId: req.user._id, otp: req.body.otp });
+        res.json(result);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
     }
 });
 

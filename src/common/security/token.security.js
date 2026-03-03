@@ -9,7 +9,7 @@ import {
 import { AudianceEnum, RoleEnum, TokenTypeEnum } from "../Enum/user.enum.js";
 import { UserModel } from "../../db/model/User.Model.js";
 import { randomUUID } from "crypto";
-import { TokenModel } from "../../db/model/Token.model.js";
+import { get, revokeTokenKey } from "../service/radis.service.js";
 
 export const generateToken = async ({
     payload = {},
@@ -73,7 +73,7 @@ export const verifyToken = async ({ token, tokenType= TokenTypeEnum.TOKEN } = {}
     const decoded = jwt.decode(token);
     console.log(decoded);
     
-    const revoked = await TokenModel.findOne({ jwtId: decoded.jti });
+    const revoked = await get(revokeTokenKey(decoded._id, decoded.jti)); 
     if (revoked) throw new Error("Token has been revoked");
 
 

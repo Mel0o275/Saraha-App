@@ -5,6 +5,7 @@ import userRouter from './modules/User/user.controller.js'
 import adminRouter from './modules/admin/admin.controller.js'
 import cors from 'cors'
 import { connectRedis } from './db/radis.connection.js'
+import { deleteUnconfirmedUsersJob } from './common/cron/delete.cron.js'
 
 async function bootstrap() {
     const app = express()
@@ -15,6 +16,7 @@ async function bootstrap() {
     app.use('/users',authRouter)
     app.use('/users',userRouter)
     app.use('/admin',adminRouter)
+    deleteUnconfirmedUsersJob()
     // app.use("/uploads", express.static("uploads"));
 
     // //invalid routing

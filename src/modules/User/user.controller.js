@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { coverPic, deleteProfilePic, logout, profile, profilePic, rotateToken, shareProfile } from "./user.service.js";
+import { coverPic, deleteProfilePic, logout, profile, profilePic, rotateToken, shareProfile, updatePass } from "./user.service.js";
 import { authentication, authorization } from "../../middleware/Auth.middleware.js";
 import { RoleEnum, TokenTypeEnum } from "../../common/Enum/user.enum.js";
 import { validate } from "../../middleware/validate.js";
@@ -153,6 +153,15 @@ router.get(
             });
         }
 });
+
+router.patch("/updatePassword", authentication(), async (req, res) => {
+    try {
+        const result = await updatePass(req.user, req.body);
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({ message: "Error updating password", error: error.message });
+    }
+})
 
 router.get("/rotate", authentication(TokenTypeEnum.REFRESH), async (req, res) => {
     try {

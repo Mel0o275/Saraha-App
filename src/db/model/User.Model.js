@@ -31,7 +31,9 @@ const UserSchema = new mongoose.Schema(
 
         changeCredentialsTime: { type: Date, default: Date.now },
 
-        visitCount: { type: Number, default: 0 }
+        visitCount: { type: Number, default: 0 },
+
+        twoFactorEnabled: { type: Boolean, default: false },
     },
     { timestamps: true }
 );
