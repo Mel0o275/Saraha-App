@@ -1,71 +1,132 @@
-# Saraha-App — First Phase
-## Authentication & OTP Implementation
+# Saraha App (Saraha Clone) — API + Reset Password UI
 
-This phase covers:
-- User registration & login
-- Email OTP (one-time password) for verification / password reset flows (depending on your design)
-- JWT-based authentication (token in headers)
-- Secure password handling (hashing)
+Anonymous messaging app backend (Node.js/Express) with authentication, OTP flows, profile sharing, uploads, and admin-only analytics. The repo also includes a small React/Vite UI for the password reset flow.
 
----
+## Features
 
-## Tech Stack
-- **Node.js + Express**
-- **MongoDB + Mongoose**
-- **JWT** for auth
-- **bcrypt** for password hashing
-- **Nodemailer** for sending OTPs
+- **Auth**: Email/password signup & login, JWT access/refresh, logout, rotate refresh token
+- **OTP**: Verify email / login confirmation / resend OTP, enable & confirm 2FA
+- **Google Sign-in**: Signup/login with Google ID token
+- **Profiles**: Get profile, share profile, upload profile/cover images, delete profile picture
+- **Messages**: Send anonymous messages (supports optional auth), list messages, get by id, delete
+- **Admin**: List users, get a user by id, view profile visit count (admin-only)
 
-## Phase 2: Profile, Multer Uploads & Google (Gmail) Auth
+## Tech stack
 
-This phase covers:
-- User profile endpoints
-- File uploads using Multer (e.g., profile picture)
-- Signup / Login with Gmail (Google OAuth)
+- **Backend**: Node.js, Express, MongoDB (Mongoose), Redis
+- **Security**: JWT, bcrypt, Helmet, rate limiting
+- **Email**: Nodemailer
+- **Uploads**: Multer
+- **Frontend (reset flow)**: React + Vite
 
-### Tech Stack (Phase 2)
-- **Multer** for file uploads
-- **Google OAuth 2.0** (ID Token) for Gmail signup/login
+## Repo structure
 
----
+- **API**: `src/` (entry: `src/main.js`)
+- **Environment files**: `config/` (loaded from `config/.env.dev` in development)
+- **Reset password UI**: `reset-password-vite/`
 
-### Features (Phase 2)
+## Prerequisites
 
-#### 1) Profile
-- Get logged-in user profile (JWT)
-- Update user profile data (JWT)
-- Upload / update profile picture (JWT)
+- **Node.js**: recent LTS recommended
+- **MongoDB**: running locally or a remote connection string
+- **Redis**: running locally or a managed Redis URL
 
-#### 2) Multer Uploads
-- Upload user profile image (with validation)
-- Allowed file types: images only (jpg/png/webp)
-- Limit file size (recommended)
+## Environment variables
 
-#### 3) Gmail (Google) Signup/Login
-- Register with Google account (first time)
-- Login with Google account (existing user)
-- Store provider info (e.g., `provider: "google"`)
-- Generate access + refresh tokens after Google verification
+The API loads env from `config/.env.dev` when running `npm run dev` (it sets `NODE_ENV=development`).
 
----
+Create `config/.env.dev` and fill in values (do **not** commit secrets):
 
-## Phase 3: Share Profile, Profile & Cover Image Upload, and Count Visits Only For Admin
+```env
+PORT=3000
+DB_URL="mongodb://localhost:27017/<db-name>"
 
-This phase covers:
-- Share profile endpoint
-- File uploads using Multer (e.g., profile picture, Cover picture)
-- Count Visits endpoints
+# Used for encrypting sensitive values (must be long & random)
+ENCRYPTION_KEY="change_me_to_a_long_random_string"
 
-### Tech Stack (Phase 3)
-- **Multer** for file uploads
----
+# Email (for OTP / password reset)
+EMAIL_USER="your-email@gmail.com"
+EMAIL_PASSWORD="your-app-password"
 
-### Features (Phase 3)
+# JWT secrets (use strong, unique values)
+SYSTEM_TOKEN_SECRET_KEY="change_me"
+USER_TOKEN_SECRET_KEY="change_me"
+REFRESH_SYSTEM_TOKEN_SECRET_KEY="change_me"
+REFRESH_USER_TOKEN_SECRET_KEY="change_me"
 
-#### 1) Profile
-- Get logged-in user profile (JWT)
-- Share profile
-- Upload / update profile picture (JWT)
-- Upload / update cover picture (JWT)
+# Redis
+REDIS_URL="redis://localhost:6379"
 
-#### 2) Count Visits
+# Optional
+SALT_ROUND=10
+```
+
+## Run locally
+
+### Backend (API)
+
+```bash
+npm install
+npm run dev
+```
+
+API starts on `http://localhost:<PORT>` and serves a basic health response at `GET /`.
+
+### Frontend (Reset password UI)
+
+```bash
+cd reset-password-vite
+npm install
+npm run dev
+```
+
+## API overview
+
+Base URL: `http://localhost:<PORT>`
+
+### Auth (`/users`)
+
+- `POST /users/signup`
+- `POST /users/verify-otp`
+- `POST /users/resend-otp`
+- `POST /users/login`
+- `POST /users/login-confirm`
+- `POST /users/signup/gmail`
+- `POST /users/login/gmail`
+- `POST /users/forget-pass`
+- `POST /users/reset-pass`
+- `POST /users/enable-2fa` (auth)
+- `POST /users/confirm-2fa` (auth)
+
+### Users (`/users`)
+
+- `GET /users/profile` (auth)
+- `GET /users/:userId/profile-share` (auth)
+- `PATCH /users/uploadProfile` (auth, multipart)
+- `PATCH /users/uploadCover` (auth, multipart)
+- `DELETE /users/deleteProfilePic` (auth)
+- `POST /users/logout` (auth)
+- `PATCH /users/updatePassword` (auth)
+- `GET /users/rotate` (refresh token auth)
+- `GET /users/views?userId=<id>` (auth + admin)
+
+### Messages (`/message`)
+
+- `GET /message` (auth)
+- `GET /message/:messageId` (auth)
+- `DELETE /message/:messageId` (auth)
+- `POST /message/:reciverId` (optional auth, multipart supported)
+
+### Admin (`/admin`)
+
+- `GET /admin/allUsers` (auth + admin)
+- `GET /admin/:userId` (auth + admin)
+
+## Notes
+
+- **Auth header**: this API expects a token in the `Authorization` header (exact format depends on your middleware implementation).
+- **Uploads**: profile uses `image` field; cover uses `cover` (array); messages use `image` (array).
+
+## License
+
+No license specified yet. Add a `LICENSE` file if you intend to open-source this project.
