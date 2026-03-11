@@ -31,38 +31,6 @@ Anonymous messaging app backend (Node.js/Express) with authentication, OTP flows
 - **MongoDB**: running locally or a remote connection string
 - **Redis**: running locally or a managed Redis URL
 
-## Environment variables
-
-The API loads env from `config/.env.dev` when running `npm run dev` (it sets `NODE_ENV=development`).
-
-Create `config/.env.dev` and fill in values (do **not** commit secrets):
-
-```env
-PORT=3000
-DB_URL="mongodb://localhost:27017/<db-name>"
-
-# Used for encrypting sensitive values (must be long & random)
-ENCRYPTION_KEY="change_me_to_a_long_random_string"
-
-# Email (for OTP / password reset)
-EMAIL_USER="your-email@gmail.com"
-EMAIL_PASSWORD="your-app-password"
-
-# JWT secrets (use strong, unique values)
-SYSTEM_TOKEN_SECRET_KEY="change_me"
-USER_TOKEN_SECRET_KEY="change_me"
-REFRESH_SYSTEM_TOKEN_SECRET_KEY="change_me"
-REFRESH_USER_TOKEN_SECRET_KEY="change_me"
-
-# Redis
-REDIS_URL="redis://localhost:6379"
-
-# Optional
-SALT_ROUND=10
-```
-
-## Run locally
-
 ### Backend (API)
 
 ```bash
