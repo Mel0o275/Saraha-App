@@ -6,10 +6,11 @@ import { validate } from "../../middleware/validate.js";
 import * as validation from "./user.validation.js";
 import { fieldValidation, upload } from "../../common/utils/multer/upload.multer.js";
 import { UserModel } from "../../db/model/User.Model.js";
+import { limiter } from "../../middleware/limiter.js";
 
 const router = Router();
 
-router.get("/profile", authentication(), async (req, res) => {
+router.get("/profile", limiter,authentication(), async (req, res) => {
     try {
         const account = await profile(req.user);
         res.status(200).json({
@@ -56,7 +57,6 @@ router.patch("/uploadProfile", authentication(), upload({
     }
 );
 
-//under development
 router.patch(
     "/uploadCover",
     authentication(),

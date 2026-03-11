@@ -109,6 +109,9 @@ export const verifyToken = async ({ token, tokenType= TokenTypeEnum.TOKEN } = {}
         throw new Error("Token has been invalidated due to credential change");
     }
 
+    console.log("decoded",decoded);
+console.log("user",user);
+
     return {
         tokenType,
         audience: role,

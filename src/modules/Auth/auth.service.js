@@ -2,11 +2,12 @@ import { UserModel } from "../../db/model/User.Model.js";
 import { compareHash, generateHash } from "../../common/security/hash.security.js";
 import { encryptData } from "../../common/security/encrypt.security.js";
 import { ProviderEnum } from "../../common/Enum/user.enum.js";
-import { createLoginCredentials } from "../../common/security/token.security.js";
+import { createLoginCredentials, generateToken } from "../../common/security/token.security.js";
 import { OAuth2Client } from 'google-auth-library';
 import { deleteKey, get, set, ttl } from "../../common/service/radis.service.js";
 import { emailEmitter } from "../../common/utils/otp/email.event.js";
 import { sendOtpEmail, sendResetPasswordEmail } from "../../common/utils/otp/email.otp.js";
+import { redisClient } from "../../db/radis.connection.js";
 
 export const generateOTP = async (userId, email) => {
     const otp = Math.floor(1000 + Math.random() * 9000).toString();
@@ -253,15 +254,21 @@ export const forgetPassword = async (email) => {
     if (!user) {
         throw new Error('User with this email does not exist');
     }
+    const token = generateToken({ email });
+    await redisClient.set(`reset:${token}`, email, "EX", 60 * 60);
 
-    const link = `http://localhost:5173/reset-password?email=${email}`;
-
+    const link = `http://localhost:5173/reset-password?token=${token}`;
     await sendResetPasswordEmail(email, link);
 
     return { message: "Password reset link sent to email" };
-}
+};
 
-export const resetPassword = async (email, newPassword) => {
+export const resetPassword = async (token, newPassword) => {
+    const email = await redisClient.get(`reset:${token}`);
+    if (!email) {
+        throw new Error('Invalid or expired token');
+    }
+
     const user = await UserModel.findOne({ email });
     if (!user) {
         throw new Error('User not found');
@@ -271,8 +278,10 @@ export const resetPassword = async (email, newPassword) => {
     user.password = hashedPassword;
     await user.save();
 
+    await redisClient.del(`reset:${token}`);
+
     return { message: "Password updated successfully" };
-}
+};
 
 export const twoFactorAuth = async ({ email }) => {
     const exist = await UserModel.findOne({ email: email });

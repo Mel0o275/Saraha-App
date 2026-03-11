@@ -40,7 +40,7 @@ router.post("/resend-otp", async (req, res) => {
     }
 });
 
-router.post("/login", validate(loginSchema),async (req, res) => {
+router.post("/login", validate(loginSchema), async (req, res) => {
     const input = req.body;
     try {
         const token = await login(input);
@@ -111,9 +111,9 @@ router.post("/forget-pass", async (req, res) => {
 });
 
 router.post(`/reset-pass`, async (req, res) => {
-    const { email, newPassword } = req.body;
+    const { token, newPassword } = req.body;
     try {
-        const result = await resetPassword(email, newPassword);
+        const result = await resetPassword(token, newPassword);
         res.status(200).json({ message: "Password updated successfully" });
     } catch (error) {
         res.status(500).json({ message: "Error updating password", error: error.message });

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>إعادة تعيين كلمة المرور</title>
+</head>
+<body>
+  <h2>إعادة تعيين كلمة المرور</h2>
+  <form id="resetForm">
+    <input type="password" id="newPassword" placeholder="كلمة المرور الجديدة" required />
+    <button type="submit">تحديث كلمة المرور</button>
+  </form>
+  <p id="message"></p>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    const form = document.getElementById('resetForm');
+    const msg = document.getElementById('message');
+
+    if (!token) {
+      msg.textContent = 'الرابط غير صالح';
+      form.style.display = 'none';
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const newPassword = document.getElementById('newPassword').value;
+      try {
+        const res = await fetch('http://localhost:3000/reset-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token, newPassword })
+        });
+        const data = await res.json();
+        msg.textContent = data.message || data.error;
+      } catch (err) {
+        msg.textContent = 'حدث خطأ';
+      }
+    });
+  </script>
+</body>
+</html>
