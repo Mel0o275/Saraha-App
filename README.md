@@ -126,7 +126,3 @@ Base URL: `http://localhost:<PORT>`
 
 - **Auth header**: this API expects a token in the `Authorization` header (exact format depends on your middleware implementation).
 - **Uploads**: profile uses `image` field; cover uses `cover` (array); messages use `image` (array).
-
-## License
-
-No license specified yet. Add a `LICENSE` file if you intend to open-source this project.
