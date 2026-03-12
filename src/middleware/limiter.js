@@ -15,7 +15,7 @@ export const limiter = rateLimit({
         res.status(options.statusCode).json({ message: options.message });
     },
     keyGenerator: (req) => {
-        const ip = req.ip.replace("::ffff:", ""); 
+        const ip = ipKeyGenerator(req); 
         return `${ip}-${req.path}`;
     },
     store: {
