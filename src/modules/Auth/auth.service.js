@@ -59,7 +59,7 @@ export const signUpWithGoogle = async (idToken) => {
     const client = new OAuth2Client();
     const ticket = await client.verifyIdToken({
         idToken,
-        audience: '905435648785-h4o7bnprocue7pf5lcgenkn6a729014r.apps.googleusercontent.com'  // Specify the WEB_CLIENT_ID of the app that accesses the backend
+        audience: '822248230063-aeiq4udlj5l4lpnno4j1di5vepbesfs3.apps.googleusercontent.com'  // Specify the WEB_CLIENT_ID of the app that accesses the backend
         // Or, if multiple clients access the backend:
         //[WEB_CLIENT_ID_1, WEB_CLIENT_ID_2, WEB_CLIENT_ID_3]
     });
@@ -230,7 +230,7 @@ export const loginWithGoogle = async (idToken) => {
     const client = new OAuth2Client();
     const ticket = await client.verifyIdToken({
         idToken,
-        audience: '905435648785-h4o7bnprocue7pf5lcgenkn6a729014r.apps.googleusercontent.com'
+        audience: '822248230063-aeiq4udlj5l4lpnno4j1di5vepbesfs3.apps.googleusercontent.com'
         // Or, if multiple clients access the backend:
         //[WEB_CLIENT_ID_1, WEB_CLIENT_ID_2, WEB_CLIENT_ID_3]
     });
